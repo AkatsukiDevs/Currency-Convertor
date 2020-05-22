@@ -96,7 +96,7 @@ public class Exchange extends JFrame {
                 String i = Exchange.this.input.getText();
 
                 if(!isNumber(i)){
-                    message="Enter only numbers!";
+                    message="Incorrect input!";
 
                 }
                 else if(i.equals(" ")){
