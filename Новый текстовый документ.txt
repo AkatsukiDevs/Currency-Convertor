@@ -1,0 +1,193 @@
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+
+import javax.swing.*;
+
+public class HangmanGUI extends JFrame implements KeyListener
+{
+    // Strings
+    private String[] words = {"dota", "csgo", "warcraft", "minecraft"};
+    private String word;
+
+    // Letters Used
+    private ArrayList <String> correctLettersUsed;
+    private ArrayList <String> incorrectLettersUsed;
+
+    // JComponents
+
+    private JTextField input;
+    private JPanel panel;
+    private JLabel label;
+    private JLabel incorrectLetters;
+    private JButton revealWord;
+
+    // Picks a random word from the words array
+    private String randomWord()
+    {
+        int i = (int) (Math.random() * (words.length));
+
+        return words[i];
+    }
+
+    // Displays the dashes for unrevealed letters
+    private String dashes()
+    {
+        String a = "";
+
+        for (int i = 0; i < word.length(); i++)
+        {
+            a += " - ";
+        }
+
+        return a;
+    }
+
+    // Decides which letters are revealed
+    private String revealedLetters()
+    {
+        String a = "";
+
+        for (int i = 0; i < word.length(); i++)
+        {
+            if (correctLettersUsed.contains(word.substring(i, i + 1)))
+            {
+                a += " " + correctLettersUsed.get(correctLettersUsed.indexOf(word.substring(i, i + 1))) + " ";
+            }
+
+            else
+            {
+                a += " - ";
+            }
+        }
+
+        return a;
+    }
+
+    // Adds incorrect letters used to an ArrayList
+    public String incorrectText()
+    {
+        String a = " ";
+
+        for (int i = 0; i < incorrectLettersUsed.size(); i++)
+        {
+            a += incorrectLettersUsed.get(i) + ", ";
+        }
+
+        return a;
+    }
+
+    // Resets the game
+    public void reset()
+    {
+        word = randomWord();
+        incorrectLettersUsed.clear();
+        correctLettersUsed.clear();
+        label.setText(dashes());
+        incorrectLetters.setText(incorrectText());
+    }
+
+    // When its too much
+    public void revealWord()
+    {
+        label.setText(word);
+        JOptionPane.showMessageDialog(HangmanGUI.getFrames()[0], "The word was " + word);
+        this.reset();
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e)
+    {
+
+    }
+
+    // Key Pressed Event
+    @Override
+    public void keyPressed(KeyEvent e)
+    {
+        String letter = e.getKeyChar() + "";
+        boolean isInWord = false;
+
+        for (int i = 0; i < word.length(); i++)
+        {
+            if (word.substring(i, i + 1).equals(letter))
+            {
+                isInWord = true;
+                correctLettersUsed.add(letter);
+            }
+        }
+
+        if (!isInWord)
+        {
+            incorrectLettersUsed.add(letter);
+
+        }
+
+        label.setText(revealedLetters());
+        incorrectLetters.setText(incorrectText() + "   " + (6 - incorrectLettersUsed.size()) + " tries remaining");
+
+        if (incorrectLettersUsed.size() > 5)
+        {
+            JOptionPane.showMessageDialog(this, "You lose! The word was " + word + "!");
+            this.reset();
+        }
+
+        if (!label.getText().contains("-"))
+        {
+            JOptionPane.showMessageDialog(this, "You win! The word was " + word + "!");
+            this.reset();
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e)
+    {
+
+    }
+
+    public HangmanGUI()
+    {
+        // Initialize
+        word = randomWord();
+        correctLettersUsed = new ArrayList <String> ();
+        incorrectLettersUsed = new ArrayList <String> ();
+        input = new JTextField();
+        panel = new JPanel();
+        label = new JLabel(dashes());
+        incorrectLetters = new JLabel(incorrectText() + "   " + (6 - incorrectLettersUsed.size()) + " tries remaining | Press a letter");
+        this.revealWord = new JButton("Give Up");
+
+        // Frame Settings
+        this.setTitle("Hangman");
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.pack();
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
+        this.setSize(250, 135);
+        this.addKeyListener(this);
+
+        // Reveal Word On Click
+        revealWord.addActionListener(
+                new ActionListener()
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        revealWord();
+                    }
+                }
+        );
+
+        // Panel and Labels Settings
+
+        panel.add(label);
+        panel.add(input).setPreferredSize(new Dimension(40,20));
+        incorrectLetters.setPreferredSize(new Dimension(200, 25));
+        panel.add(incorrectLetters);
+        panel.add(revealWord);
+        setContentPane(panel);
+    }
+}
