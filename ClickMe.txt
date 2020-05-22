@@ -1,0 +1,2 @@
+This program converts soms to other currents.
+Enter amount of soms and click to Convert.
